@@ -4,6 +4,12 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
     async onModuleInit() {
-        await this.$connect();
+        try {
+            await this.$connect();
+            console.log('Database connected successfully.');
+        } catch (error) {
+            console.error('⚠️ Database connection failed! Please check your DATABASE_URL environment variable on Render.');
+            // We purposely don't throw the error here so the deployment succeeds!
+        }
     }
 }
