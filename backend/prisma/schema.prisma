@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+enum Role {
+  ADMIN
+  DOCTOR
+  STAFF
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(DOCTOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prescriptions Prescription[]
+}
+
+model Patient {
+  id        String   @id @default(uuid())
+  name      String
+  age       Int
+  gender    String // 'Male', 'Female', 'Other'
+  weight    Float?
+  mobile    String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prescriptions Prescription[]
+}
+
+model Medicine {
+  id              String   @id @default(uuid())
+  name            String
+  genericName     String?
+  type            String   @default("Tablet") // Tablet, Capsule, Syrup, Injection, etc.
+  defaultDosage   String? // e.g., "500mg"
+  defaultDuration String? // e.g., "5 days"
+  defaultFreq     String? // e.g., "1-0-1"
+  instruction     String? // e.g., "After Food"
+  
+  items PrescriptionItem[]
+}
+
+model Prescription {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  diagnosis String?
+  notes     String?
+  
+  doctorId  String
+  doctor    User    @relation(fields: [doctorId], references: [id])
+  
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  items     PrescriptionItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PrescriptionItem {
+  id             String @id @default(uuid())
+  prescriptionId String
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+
+  medicineId     String
+  medicine       Medicine @relation(fields: [medicineId], references: [id])
+
+  dosage         String // e.g., "500mg"
+  frequency      String // e.g., "1-0-1" (Morning-Afternoon-Night)
+  duration       String // e.g., "5 days"
+  instruction    String? // e.g., "After Food"
+}
