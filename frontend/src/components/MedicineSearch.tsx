@@ -45,7 +45,8 @@ export function MedicineSearch() {
                 // Vite proxy usually needed or absolute URL. 
                 // Let's assume localhost:3000 for now or relative if proxy set.
                 // Assuming no proxy set yet, so using absolute for dev.
-                const res = await fetch(`http://localhost:3000/medicines?q=${encodeURIComponent(debouncedQuery)}`);
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                const res = await fetch(`${apiUrl}/medicines?q=${encodeURIComponent(debouncedQuery)}`);
                 if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
 
